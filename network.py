@@ -10,7 +10,7 @@ K.set_image_dim_ordering('th')
 import os 
 from keras.models import Sequential,load_model
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
+from keras.layers import Conv2D, MaxPooling2D
 from keras.utils import np_utils
 
 
@@ -19,21 +19,26 @@ class NeuralNetwork():
     def __init__(self):
         self.net=Sequential()
     
-    def create(self,data,size=(28,28),epoch=1):
+    def create(self,size=(28,28,1)):
         
-        self.net.add(Convolution2D(64, 3, 3, activation='relu', input_shape=(3,size[0],size[1])))
-
-
-        self.net.add(Convolution2D(64, 3, 3, activation='relu'))
+        self.net.add(Conv2D(32, 2, 2, activation='relu', input_shape=(size[2],size[0],size[1])))
+       
         self.net.add(MaxPooling2D(pool_size=(2,2)))
-        self.net.add(Dropout(0.25))
+        
+        self.net.add(Conv2D(16, 2, 2, activation='relu', input_shape=(size[2],size[0],size[1])))
+       
+        self.net.add(MaxPooling2D(pool_size=(2,2)))
+        
+        self.net.add(Dropout(0.5))
  
         self.net.add(Flatten())
 
         self.net.add(Dense(size[0]*size[1], activation='relu'))
         self.net.compile(loss='mean_squared_error',optimizer='adam',metrics=['accuracy'])
-        self.net.fit(data[0], data[1],batch_size=32, nb_epoch=epoch, verbose=1)
         
+    def learn(self,data,epoch=1):
+        self.net.fit(data[0], data[1],batch_size=32, nb_epoch=epoch, verbose=1)
+    
 
     def load(self,file):
         
